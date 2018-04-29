@@ -13,7 +13,8 @@ class UserAuthenticator
       @user.password_required!
     end
 
-    @user.skip_email_validation = true if @session && @session[:skip_email_validation].present?
+    # @user.skip_email_validation = true if @session && @session[:skip_email_validation].present?
+    @user.skip_email_validation = true
   end
 
   def has_authenticator?
@@ -26,11 +27,13 @@ class UserAuthenticator
   end
 
   def email_valid?
-    @session && @session[:email_valid]
+    !!@session
+    # @session && @session[:email_valid]
   end
 
   def authenticated?
-    @session && @session[:email] == @user.email && @session[:email_valid]
+    !!@session # && @session[:btc_wallet_address] == @user.btc_wallet_address
+    # @session && @session[:email] == @user.email && @session[:email_valid]
   end
 
   private

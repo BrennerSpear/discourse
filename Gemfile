@@ -96,6 +96,8 @@ gem 'mini_racer'
 gem 'highline', require: false
 gem 'rack-protection' # security
 
+gem 'bitcoin-ruby', git: 'https://github.com/lian/bitcoin-ruby', branch: 'master', require: 'bitcoin'
+
 # Gems used only for assets and not required in production environments by default.
 # Allow everywhere for now cause we are allowing asset debugging in production
 group :assets do

@@ -231,6 +231,7 @@ basic:
     default: false
 
 login:
+  btc_message: "this is a message"
   invite_only:
     refresh: true
     client: true
@@ -362,7 +363,7 @@ users:
     max: 60
   reserved_usernames:
     type: list
-    default: "admin|moderator|administrator|mod|sys|system|community|info|you|name|username|user|nickname|discourse|discourseorg|discourseforum|support|hp|account-created|password-reset|admin-login|confirm-admin|account-created|activate-account|confirm-email-token|authorize-email"
+    default: "admin|moderator|administrator|mod|sys|system|community|info|you|name|username|user|nickname|discourse|discourseorg|discourseforum|support|hp|account-created|password-reset|admin-login|confirm-admin|account-created|activate-account|confirm-email-token|authorize-email|satoshi|btc|bitcoin|bch|satoshinakamoto"
   min_password_length:
     client: true
     default: 10
@@ -764,7 +765,7 @@ email:
   delete_email_logs_after_days:
     default: 365
   max_emails_per_day_per_user: 100
-  enable_staged_users: true
+  enable_staged_users: false
   maximum_staged_users_per_email: 10
   auto_generated_whitelist:
     default: ''

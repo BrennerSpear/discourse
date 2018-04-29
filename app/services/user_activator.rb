@@ -27,15 +27,16 @@ class UserActivator
   end
 
   def factory
-    invite = Invite.find_by(email: Email.downcase(@user.email))
+    LoginActivator
+    # invite = Invite.find_by(email: Email.downcase(@user.email))
 
-    if !user.active?
-      EmailActivator
-    elsif SiteSetting.must_approve_users? && !(invite.present? && !invite.expired? && !invite.destroyed? && invite.link_valid?)
-      ApprovalActivator
-    else
-      LoginActivator
-    end
+    # if !user.active?
+    #   EmailActivator
+    # elsif SiteSetting.must_approve_users? && !(invite.present? && !invite.expired? && !invite.destroyed? && invite.link_valid?)
+      # ApprovalActivator
+    # else
+    #   LoginActivator
+    # end
   end
 
 end

@@ -1,6 +1,6 @@
 class UsernameCheckerService
 
-  def check_username(username, email)
+  def check_username(username, email=nil)
     if username && username.length > 0
       validator = UsernameValidator.new(username)
       if !validator.valid_format?
@@ -12,8 +12,9 @@ class UsernameCheckerService
   end
 
   def check_username_availability(username, email)
-    if User.username_available?(username, email)
-      { available: true, is_developer: is_developer?(email) }
+    if User.username_available?(username)
+      # { available: true, is_developer: is_developer?(email) }
+      { available: true, is_developer: false }
     else
       { available: false, suggestion: UserNameSuggester.suggest(username) }
     end

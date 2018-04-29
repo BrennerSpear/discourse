@@ -1,9 +1,12 @@
+require 'pry'
+require 'bitcoin'
 require_dependency 'discourse_hub'
 require_dependency 'user_name_suggester'
 require_dependency 'rate_limiter'
 require_dependency 'wizard'
 require_dependency 'wizard/builder'
 require_dependency 'admin_confirmation'
+
 
 class UsersController < ApplicationController
 
@@ -21,7 +24,7 @@ class UsersController < ApplicationController
     :my_redirect, :toggle_anon, :admin_login, :confirm_admin, :email_login
   ]
 
-  before_action :respond_to_suspicious_request, only: [:create]
+  # before_action :respond_to_suspicious_request, only: [:create]
 
   # we need to allow account creation with bad CSRF tokens, if people are caching, the CSRF token on the
   #  page is going to be empty, this means that server will see an invalid CSRF and blow the session
@@ -287,7 +290,7 @@ class UsersController < ApplicationController
   # if the username is not available.
   def check_username
     if !params[:username].present?
-      params.require(:username) if !params[:email].present?
+      # params.require(:username) if !params[:email].present?
       return render(json: success_json)
     end
     username = params[:username]
@@ -298,8 +301,8 @@ class UsersController < ApplicationController
     return render_available_true if changing_case_of_own_username(target_user, username)
 
     checker = UsernameCheckerService.new
-    email = params[:email] || target_user.try(:email)
-    render json: checker.check_username(username, email)
+    # email = params[:email] || target_user.try(:email)
+    render json: checker.check_username(username)
   end
 
   def user_from_params_or_current_user
@@ -307,8 +310,18 @@ class UsersController < ApplicationController
   end
 
   def create
-    params.require(:email)
+
+    params.require(:btc_wallet_address)
+    # params.require(:email)
     params.permit(:user_fields)
+
+    message = SiteSetting.btc_message
+    btc_wallet_address = params[:btc_wallet_address]
+    signature = params[:password]
+
+    unless Bitcoin.verify_message(btc_wallet_address, signature, message)
+      return fail_with("login.btc_verification_failed")
+    end
 
     unless SiteSetting.allow_new_registrations
       return fail_with("login.new_registrations_disabled")
@@ -318,21 +331,23 @@ class UsersController < ApplicationController
       return fail_with("login.password_too_long")
     end
 
-    if params[:email].length > 254 + 1 + 253
-      return fail_with("login.email_too_long")
-    end
+    # if params[:email].length > 254 + 1 + 253
+    #   return fail_with("login.email_too_long")
+    # end
 
     if User.reserved_username?(params[:username])
       return fail_with("login.reserved_username")
     end
 
     new_user_params = user_params
-    user = User.unstage(new_user_params)
-    user = User.new(new_user_params) if user.nil?
+    user = User.new(new_user_params)
+    # user = User.unstage(new_user_params)
+    # user = User.new(new_user_params) if user.nil?
 
     # Handle API approval
     if user.approved
-      user.approved_by_id ||= current_user.id
+      user.approved_by_id ||= user.id
+      # user.approved_by_id ||= current_user.id
       user.approved_at ||= Time.zone.now
     end
 
@@ -362,17 +377,17 @@ class UsersController < ApplicationController
 
     authentication.start
 
-    if authentication.email_valid? && !authentication.authenticated?
-      # posted email is different that the already validated one?
-      return fail_with('login.incorrect_username_email_or_password')
-    end
+    # if authentication.email_valid? && !authentication.authenticated?
+    #   # posted email is different that the already validated one?
+    #   return fail_with('login.incorrect_username_email_or_password')
+    # end
 
     activation = UserActivator.new(user, request, session, cookies)
     activation.start
 
     # just assign a password if we have an authenticator and no password
     # this is the case for Twitter
-    user.password = SecureRandom.hex if user.password.blank? && authentication.has_authenticator?
+    # user.password = SecureRandom.hex if user.password.blank? && authentication.has_authenticator?
 
     if user.save
       authentication.finish
@@ -1031,6 +1046,7 @@ class UsersController < ApplicationController
         :email,
         :password,
         :username,
+        :btc_wallet_address,
         :title,
         :date_of_birth,
         :muted_usernames,
@@ -1051,8 +1067,8 @@ class UsersController < ApplicationController
       result = params
         .permit(permitted)
         .reverse_merge(
-          ip_address: request.remote_ip,
-          registration_ip_address: request.remote_ip,
+          # ip_address: request.remote_ip,
+          # registration_ip_address: request.remote_ip,
           locale: user_locale
         )
 
@@ -1063,13 +1079,14 @@ class UsersController < ApplicationController
 
         result.merge!(params.permit(:active, :staged, :approved))
       end
-
       modify_user_params(result)
     end
 
     # Plugins can use this to modify user parameters
     def modify_user_params(attrs)
-      attrs
+      attrs[:active] = true
+      attrs[:approved] = true
+      return attrs
     end
 
     def user_locale

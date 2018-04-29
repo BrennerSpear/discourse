@@ -92,8 +92,8 @@ class User < ActiveRecord::Base
   validate :password_validator
   validates :name, user_full_name: true, if: :will_save_change_to_name?, length: { maximum: 255 }
   validates :ip_address, allowed_ip_address: { on: :create, message: :signup_not_allowed }
-  validates :primary_email, presence: true
-  validates_associated :primary_email, message: -> (_, user_email) { user_email[:value]&.errors[:email]&.first }
+  # validates :primary_email, presence: true
+  # validates_associated :primary_email, message: -> (_, user_email) { user_email[:value]&.errors[:email]&.first }
 
   after_initialize :add_trust_level
 
@@ -204,12 +204,10 @@ class User < ActiveRecord::Base
     SiteSetting.min_username_length.to_i..SiteSetting.max_username_length.to_i
   end
 
-  def self.username_available?(username, email = nil)
+  def self.username_available?(username)
     lower = username.downcase
     return false if reserved_username?(lower)
     return true  if !User.exists?(username_lower: lower)
-    # staged users can use the same username since they will take over the account
-    email.present? && User.joins(:user_emails).exists?(staged: true, username_lower: lower, user_emails: { primary: true, email: email })
   end
 
   def self.reserved_username?(username)
@@ -261,9 +259,10 @@ class User < ActiveRecord::Base
   def self.new_from_params(params)
     user = User.new
     user.name = params[:name]
-    user.email = params[:email]
+    # user.email = params[:email]
     user.password = params[:password]
     user.username = params[:username]
+    user.btc_wallet_address = params[:btc_wallet_address]
     user
   end
 
@@ -776,16 +775,17 @@ class User < ActiveRecord::Base
   end
 
   def email_confirmed?
-    email_tokens.where(email: email, confirmed: true).present? || email_tokens.empty?
+    # email_tokens.where(email: email, confirmed: true).present? || email_tokens.empty?
+    true
   end
 
   def activate
-    if email_token = self.email_tokens.active.where(email: self.email).first
-      user = EmailToken.confirm(email_token.token)
-      self.update!(active: true) if user.nil?
-    else
-      self.update!(active: true)
-    end
+    # if email_token = self.email_tokens.active.where(email: self.email).first
+    #   user = EmailToken.confirm(email_token.token)
+    #   self.update!(active: true) if user.nil?
+    # else
+    self.update!(active: true)
+    # end
   end
 
   def deactivate
@@ -1031,7 +1031,8 @@ class User < ActiveRecord::Base
   end
 
   def email
-    primary_email.email
+    nil
+    # primary_email.email
   end
 
   def email=(new_email)
