@@ -231,7 +231,7 @@ basic:
     default: false
 
 login:
-  btc_message: "this is a message"
+  btc_message: "discourse"
   invite_only:
     refresh: true
     client: true
