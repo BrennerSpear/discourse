@@ -30,19 +30,19 @@ task "admin:invite", [:email] => [:environment] do |_, args|
   Jobs.enqueue(:user_email, type: :account_created, user_id: user.id, email_token: email_token.token)
 end
 
-desc "Creates a forum administrator"
+desc "Creates a btc forum administrator"
 task "admin:create" => :environment do
   require 'highline/import'
 
   begin
-    email = ask("Email:  ")
-    existing_user = User.find_by_email(email)
+    username = ask("username:  ")
+    existing_user = User.find_by_username(username)
 
     # check if user account already exixts
     if existing_user
       # user already exists, ask for password reset
       admin = existing_user
-      reset_password = ask("User with this email already exists! Do you want to reset the password for this email? (Y/n)  ")
+      reset_password = ask("User with this username already exists! Do you want to reset the password for this username? (Y/n)  ")
       if (reset_password == "" || reset_password.downcase == 'y')
         begin
           password = ask("Password:  ") { |q| q.echo = false }
@@ -53,8 +53,7 @@ task "admin:create" => :environment do
     else
       # create new user
       admin = User.new
-      admin.email = email
-      admin.username = UserNameSuggester.suggest(admin.email)
+      admin.username = username
       begin
         password = ask("Password:  ") { |q| q.echo = false }
         password_confirmation = ask("Repeat password:  ") { |q| q.echo = false }
@@ -85,7 +84,7 @@ task "admin:create" => :environment do
   if (grant_admin == "" || grant_admin.downcase == 'y')
     admin.grant_admin!
     if admin.trust_level < 1
-      admin.change_trust_level!(1)
+      admin.change_trust_level!(4)
     end
     admin.email_tokens.update_all confirmed: true
     admin.activate

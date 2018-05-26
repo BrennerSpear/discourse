@@ -99,7 +99,7 @@ class User < ActiveRecord::Base
 
   before_validation :set_skip_validate_email
 
-  after_create :create_email_token
+  # after_create :create_email_token
   after_create :create_user_stat
   after_create :create_user_option
   after_create :create_user_profile

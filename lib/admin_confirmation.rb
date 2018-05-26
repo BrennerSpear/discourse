@@ -21,12 +21,12 @@ class AdminConfirmation
     }
     $redis.setex("admin-confirmation-token:#{@token}", 3.hours.to_i, payload.to_json)
 
-    Jobs.enqueue(
-      :admin_confirmation_email,
-      to_address: @performed_by.email,
-      target_username: @target_user.username,
-      token: @token
-    )
+    # Jobs.enqueue(
+    #   :admin_confirmation_email,
+    #   to_address: @performed_by.email,
+    #   target_username: @target_user.username,
+    #   token: @token
+    # )
   end
 
   def email_confirmed!
