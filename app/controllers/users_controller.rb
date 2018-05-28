@@ -311,13 +311,11 @@ class UsersController < ApplicationController
 
   def create
 
-    params.require(:btc_wallet_address)
-    # params.require(:email)
     params.permit(:user_fields)
 
     message = SiteSetting.btc_message
     btc_wallet_address = params[:btc_wallet_address]
-    signature = params[:password]
+    signature = params[:signature]
 
     unless Bitcoin.verify_message(btc_wallet_address, signature, message)
       return fail_with("login.btc_verification_failed")
@@ -446,6 +444,7 @@ class UsersController < ApplicationController
     render json: { value: honeypot_value, challenge: challenge_value }
   end
 
+  # TODO reset by re-verifying a wallet address attached to the account
   def password_reset
     expires_now
 

@@ -34,30 +34,30 @@ export default Ember.Controller.extend(ModalFunctionality, PasswordValidation, U
       accountUsername: '',
       accountBtcWalletAddress: '',
       accountSignature: '',
-      // accountPassword: '',
-      // authOptions: null,
-      // complete: false,
-      // formSubmitted: false,
-      // rejectedEmails: [],
-      // rejectedPasswords: [],
-      // prefilledUsername: null,
-      // isDeveloper: false
+      accountPassword: '',
+      authOptions: null,
+      complete: false,
+      formSubmitted: false,
+      rejectedEmails: [],
+      rejectedPasswords: [],
+      prefilledUsername: null,
+      isDeveloper: false
     });
     this._createUserFields();
   },
 
   submitDisabled: function() {
-    debugger;
     if (!this.get('accountUsername')) return true;
     if (!this.get('accountBtcWalletAddress')) return true;
     if (!this.get('accountSignature')) return true;
+    if (!this.get('accountPassword')) return true;
     // if (!this.get('emailValidation.failed') && !this.get('passwordRequired')) return false; // 3rd party auth
-    // if (this.get('formSubmitted')) return true;
+    if (this.get('formSubmitted')) return true;
     // if (this.get('nameValidation.failed')) return true;
     // if (this.get('emailValidation.failed')) return true;
-    // if (this.get('usernameValidation.failed')) return true;
-    // if (this.get('passwordValidation.failed')) return true;
-    // if (this.get('userFieldsValidation.failed')) return true;
+    if (this.get('usernameValidation.failed')) return true;
+    if (this.get('passwordValidation.failed')) return true;
+    if (this.get('userFieldsValidation.failed')) return true;
 
     return false;
   }.property('passwordRequired', 'nameValidation.failed', 'emailValidation.failed', 'usernameValidation.failed', 'passwordValidation.failed', 'userFieldsValidation.failed', 'formSubmitted'),
@@ -164,7 +164,12 @@ export default Ember.Controller.extend(ModalFunctionality, PasswordValidation, U
 
     createAccount() {
       const self = this,
-          attrs = this.getProperties('accountUsername', 'accountBtcWalletAddress', 'accountSignature'),
+          attrs = this.getProperties(
+            'accountUsername',
+            'accountBtcWalletAddress',
+            'accountSignature',
+            'accountPassword'
+          ),
           userFields = this.get('userFields');
 
       // Add the userfields to the data

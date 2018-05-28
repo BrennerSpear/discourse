@@ -646,8 +646,9 @@ User.reopenClass(Singleton, {
       data: {
         name: attrs.accountName,
         email: attrs.accountEmail,
-        password: attrs.accountSignature,
+        password: attrs.accountPassword,
         username: attrs.accountUsername,
+        signature: attrs.accountSignature,
         btc_wallet_address: attrs.accountBtcWalletAddress,
         password_confirmation: attrs.accountPasswordConfirm,
         challenge: attrs.accountChallenge,
