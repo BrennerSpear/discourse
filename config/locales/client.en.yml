@@ -803,11 +803,11 @@ en:
 
       btc_wallet_address:
         title: "Wallet Address"
-        instructions: "Private Key + Message = Signature"
+        instructions: "looks like this: 1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4xqX"
 
       signature:
         title: "Signature"
-        instructions: "Sign the message discourse with your private key to generate the signature"
+        instructions: "Sign the message 'discourse' with your private key to generate a signature"
 
       name:
         title: "Name"
@@ -1117,7 +1117,7 @@ en:
     create_account:
       disclaimer: "By registering, you agree to the <a href='{{privacy_link}}'>privacy policy</a> and <a href='{{tos_link}}'>terms of service</a>."
       title: "Create New Account"
-      failed: "Something went wrong, perhaps this email is already registered, try the forgot password link"
+      failed: "Something went wrong, you probably left a field blank"
 
     forgot_password:
       title: "Password Reset"

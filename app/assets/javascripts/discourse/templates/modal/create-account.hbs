@@ -23,14 +23,14 @@
             <td><label>{{i18n 'user.email.instructions'}}</label></td>
           </tr> --}}
 
-          <tr class="input create-account-btc-public-key">
-                <td class="label"><label for='new-account-public-key'>{{i18n 'user.btc_wallet_address.title'}}</label></td>
+          <tr class="input create-account-btc-wallet-address">
+                <td class="label"><label for='new-account-wallet-address'>{{i18n 'user.btc_wallet_address.title'}}</label></td>
                 <td>
-                {{input type="text" value=accountBtcWalletAddress id="new-account-public-key" name="btc-public-key" autofocus="autofocus"}}
-                &nbsp;{{input-tip validation=btcPublicKeyValidation}}
+                {{input type="text" value=accountBtcWalletAddress id="new-account-wallet-address" name="btc-wallet-address" autofocus="autofocus"}}
+                &nbsp;{{input-tip validation=btcWalletAddressValidation}} {{!-- TODO frontend btc wallet address validation --}}
                 </td>
           </tr>
-          <tr class="instructions create-account-btc-public-key">
+          <tr class="instructions create-account-btc-wallet-address">
             <td></td>
             <td><label>{{i18n 'user.btc_wallet_address.instructions'}}</label></td>
           </tr>
@@ -39,15 +39,15 @@
                 <td class="label"><label for='new-account-signature'>{{i18n 'user.signature.title'}}</label></td>
                 <td>
                 {{input type="text" value=accountSignature id="new-account-signature" name="new-account-signature" autofocus="autofocus"}}
-                &nbsp;{{input-tip validation=signatureValidation}}
+                &nbsp;{{input-tip validation=signatureValidation}} {{!-- TODO frontend signature validation --}}
                 </td>
           </tr>
-          <tr class="instructions create-account-btc-public-key">
+          <tr class="instructions create-account-btc-wallet-address">
             <td></td>
             <td><label>{{i18n 'user.signature.instructions'}}</label></td>
           </tr>
 
-         {{!--  {{#if usernameRequired}} --}}
+          {{#if usernameRequired}}
             <tr class="input">
                   <td class="label"><label for='new-account-username'>{{i18n 'user.username.title'}}</label></td>
                   <td>
@@ -59,9 +59,9 @@
               <td></td>
               <td><label>{{i18n 'user.username.instructions'}}</label></td>
             </tr>
-          {{!-- {{/if}} --}}
+          {{/if}}
 
-          {{!-- {{#if fullnameRequired}}
+{{!--           {{#if fullnameRequired}}
             <tr class="input">
               <td class="label">
                 <label for='new-account-name'>{{i18n 'user.name.title'}}</label>
@@ -75,7 +75,7 @@
               <td><label>{{nameInstructions}}</label></td>
             </tr>
           {{/if}}
-
+ --}}
           {{plugin-outlet name="create-account-before-password"
                           args=(hash accountName=accountName
                                      accountUsername=accountUsername
@@ -106,7 +106,7 @@
               {{input type="password" value=accountPasswordConfirm id="new-account-confirmation" autocomplete="new-password"}}
               {{input value=accountChallenge id="new-account-challenge"}}
             </td>
-          </tr> --}}
+          </tr>
 
           </table>
 
