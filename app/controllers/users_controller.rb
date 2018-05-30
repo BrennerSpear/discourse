@@ -1,5 +1,6 @@
 require 'pry'
 require 'bitcoin'
+require 'blockchain'
 require_dependency 'discourse_hub'
 require_dependency 'user_name_suggester'
 require_dependency 'rate_limiter'
@@ -310,16 +311,7 @@ class UsersController < ApplicationController
   end
 
   def create
-
-    params.permit(:user_fields)
-
-    message = SiteSetting.btc_message
-    btc_wallet_address = params[:btc_wallet_address]
-    signature = params[:signature]
-
-    unless Bitcoin.verify_message(btc_wallet_address, signature, message)
-      return fail_with("login.btc_verification_failed")
-    end
+    params.permit(:username, :password, :signature, :btc_wallet_address, :user_fields)
 
     unless SiteSetting.allow_new_registrations
       return fail_with("login.new_registrations_disabled")
@@ -329,13 +321,29 @@ class UsersController < ApplicationController
       return fail_with("login.password_too_long")
     end
 
-    # if params[:email].length > 254 + 1 + 253
-    #   return fail_with("login.email_too_long")
-    # end
-
     if User.reserved_username?(params[:username])
       return fail_with("login.reserved_username")
     end
+
+    message = SiteSetting.btc_message
+    btc_wallet_address = params[:btc_wallet_address]
+    signature = params[:signature]
+
+    unless Bitcoin.verify_message(btc_wallet_address, signature, message)
+      return fail_with("login.btc_verification_failed")
+    end
+
+    explorer = Blockchain::BlockExplorer.new # (api_code = 'your-api-code')
+
+    wallet_balance = explorer.get_address_by_base58(btc_wallet_address).final_balance
+
+    unless wallet_balance > 100000
+      return fail_with("login.not_enough_btc")
+    end
+
+    # if params[:email].length > 254 + 1 + 253
+    #   return fail_with("login.email_too_long")
+    # end
 
     new_user_params = user_params
     user = User.new(new_user_params)
