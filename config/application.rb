@@ -142,6 +142,7 @@ module Discourse
       :facebook_app_secret,
       :github_client_secret,
       :second_factor_token,
+      :signature,
     ]
 
     # Enable the asset pipeline

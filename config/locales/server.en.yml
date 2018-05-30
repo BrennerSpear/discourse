@@ -1860,6 +1860,7 @@ en:
     second_factor_description: "Please enter the required authentication code from your app:"
     invalid_second_factor_code: "Invalid authentication code"
     btc_verification_failed: "The signature does not match the public key"
+    not_enough_btc: "The wallet address does not have at least 100k Satoshi"
 
   user:
     no_accounts_associated: "No accounts associated"

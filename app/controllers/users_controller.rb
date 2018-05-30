@@ -1,5 +1,6 @@
 require 'pry'
 require 'bitcoin'
+require 'blockchain'
 require_dependency 'discourse_hub'
 require_dependency 'user_name_suggester'
 require_dependency 'rate_limiter'
@@ -310,8 +311,7 @@ class UsersController < ApplicationController
   end
 
   def create
-
-    params.permit(:user_fields)
+    params.permit(:username, :password, :signature, :btc_wallet_address, :user_fields)
 
     message = SiteSetting.btc_message
     btc_wallet_address = params[:btc_wallet_address]
@@ -319,6 +319,14 @@ class UsersController < ApplicationController
 
     unless Bitcoin.verify_message(btc_wallet_address, signature, message)
       return fail_with("login.btc_verification_failed")
+    end
+
+    explorer = Blockchain::BlockExplorer.new # (api_code = 'your-api-code')
+
+    wallet_balance = explorer.get_address_by_base58(btc_wallet_address).final_balance
+
+    unless wallet_balance > 100000
+      return fail_with("login.not_enough_btc")
     end
 
     unless SiteSetting.allow_new_registrations
