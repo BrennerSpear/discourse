@@ -313,6 +313,18 @@ class UsersController < ApplicationController
   def create
     params.permit(:username, :password, :signature, :btc_wallet_address, :user_fields)
 
+    unless SiteSetting.allow_new_registrations
+      return fail_with("login.new_registrations_disabled")
+    end
+
+    if params[:password] && params[:password].length > User.max_password_length
+      return fail_with("login.password_too_long")
+    end
+
+    if User.reserved_username?(params[:username])
+      return fail_with("login.reserved_username")
+    end
+
     message = SiteSetting.btc_message
     btc_wallet_address = params[:btc_wallet_address]
     signature = params[:signature]
@@ -329,21 +341,9 @@ class UsersController < ApplicationController
       return fail_with("login.not_enough_btc")
     end
 
-    unless SiteSetting.allow_new_registrations
-      return fail_with("login.new_registrations_disabled")
-    end
-
-    if params[:password] && params[:password].length > User.max_password_length
-      return fail_with("login.password_too_long")
-    end
-
     # if params[:email].length > 254 + 1 + 253
     #   return fail_with("login.email_too_long")
     # end
-
-    if User.reserved_username?(params[:username])
-      return fail_with("login.reserved_username")
-    end
 
     new_user_params = user_params
     user = User.new(new_user_params)
